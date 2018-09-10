@@ -1,6 +1,10 @@
 package com.example.hp.sms;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.widget.EditText;
@@ -24,6 +28,17 @@ EditText OtpTyped;
          OtpTyped= (EditText)findViewById(R.id.otp);
         ButterKnife.bind(this);
     }
+    private BroadcastReceiver receiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent.getAction().equalsIgnoreCase("otp")) {
+                final String message = intent.getStringExtra("message");
+
+              //  TextView tv = (TextView) findViewById(R.id.txtview);
+                OtpTyped.setText(message);
+            }
+        }
+    };
     @OnClick(R.id.verify)
     public void verify()
     {
@@ -37,5 +52,16 @@ EditText OtpTyped;
        {
            Toast.makeText(this,"Wrong Otp",Toast.LENGTH_SHORT).show();
        }
+    }
+    @Override
+    public void onResume() {
+        LocalBroadcastManager.getInstance(this).registerReceiver(receiver, new IntentFilter("otp"));
+        super.onResume();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(receiver);
     }
 }

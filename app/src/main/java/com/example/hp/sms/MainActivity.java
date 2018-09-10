@@ -26,12 +26,15 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 
 public class MainActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
+    private static final int PERMISSION_REQUEST_CODE2 = 24;
     Spinner country,state;
     String[] statesArray;
     ArrayAdapter statesAdapter;
     public static final int PERMISSION_REQUEST_CODE=909;
     @BindView(R.id.Phone)
     EditText phone;
+    private static final int PERMISSION_REQUEST_CODE3=34;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -52,18 +55,20 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.M)
         {
             // Toast.makeText(this,"Android version",Toast.LENGTH_SHORT).show();
-            if (checkSelfPermission(Manifest.permission.SEND_SMS) != PackageManager.PERMISSION_GRANTED) {
+            if (checkSelfPermission(Manifest.permission.SEND_SMS)   != PackageManager.PERMISSION_GRANTED) {
+                if(checkSelfPermission(Manifest.permission.RECEIVE_SMS)!= PackageManager.PERMISSION_GRANTED)
                 //Toast.makeText(this,"check permission",Toast.LENGTH_SHORT).show();
                 if (shouldShowRequestPermissionRationale(Manifest.permission.SEND_SMS)) {
                   //  Toast.makeText(this,"Repeate",Toast.LENGTH_SHORT).show();
                     new AlertDialog.Builder(MainActivity.this)
-                            .setTitle("Call Permission")
-                            .setMessage("How am I supposed to make call without call permission? Please give the call permission.")
+                            .setTitle("SMS Permission")
+                            .setMessage("Please give the SMS permission.")
                             .setPositiveButton("Okay", new DialogInterface.OnClickListener() {
                                 @RequiresApi(api = Build.VERSION_CODES.M)
                                 @Override
                                 public void onClick(DialogInterface dialogInterface, int i) {
                                     requestPermissions(new String[]{Manifest.permission.SEND_SMS}, PERMISSION_REQUEST_CODE);
+                                    requestPermissions(new String[] { Manifest.permission.RECEIVE_SMS},PERMISSION_REQUEST_CODE2);
                                 }
                             })
                             .setNegativeButton("No thanks", new DialogInterface.OnClickListener() {
@@ -74,6 +79,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                             }).show();
                 } else {
                     requestPermissions(new String[]{Manifest.permission.SEND_SMS}, PERMISSION_REQUEST_CODE);
+                    requestPermissions(new String[] { Manifest.permission.RECEIVE_SMS},PERMISSION_REQUEST_CODE2);
+                    requestPermissions(new String[] { Manifest.permission.READ_SMS},PERMISSION_REQUEST_CODE3);
                 }
             } else {
                 sms();
@@ -97,7 +104,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         PendingIntent pi= PendingIntent.getActivity(this,0,intent,0);
 
         SmsManager smsManager=SmsManager.getDefault();
-        smsManager.sendTextMessage(phoneNo,null,"hey! OTP is here:"+r,pi,null);
+        smsManager.sendTextMessage(phoneNo,null,""+r,pi,null);
        // Intent i=new Intent(getApplicationContext(),verification.class);
 
        // startActivity(intent);
